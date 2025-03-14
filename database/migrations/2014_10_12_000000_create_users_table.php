@@ -12,6 +12,8 @@ return new class extends Migration {
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+            $table->unsignedInteger('credential_id');
+            $table->string('email')->unique();
             $table->string('employee_id');
             $table->string('prefix')->nullable();
             $table->string('first_name')->nullable();

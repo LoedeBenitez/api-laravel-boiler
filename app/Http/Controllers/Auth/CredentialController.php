@@ -1,14 +1,16 @@
 <?php
 
-namespace App\Http\Controllers\v1\Auth;
+namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Models\CredentialModel;
+use App\Models\UserModel;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Traits\ResponseTrait;
 use DB;
+use Illuminate\Support\Str;
 use Laravel\Sanctum\PersonalAccessToken;
 
 class CredentialController extends Controller
@@ -18,35 +20,43 @@ class CredentialController extends Controller
     public function onLogin(Request $request)
     {
         $fields = $request->validate([
-            'employee_id' => 'required',
-            'prefix' => 'nullable|string',
-            'first_name' => 'nullable|string',
-            'middle_name' => 'nullable|string',
-            'last_name' => 'nullable|string',
-            'suffix' => 'nullable|string',
-            'position' => 'nullable|string',
-            'user_access' => 'nullable|string',
+            'email' => 'required|exists:credentials,email',
+            'password' => 'required',
         ]);
         try {
             DB::beginTransaction();
-            $userExist = User::where('employee_id', $fields['employee_id'])->first();
-            if (!$userExist) {
-                User::insert([
-                    'employee_id' => $fields['employee_id'],
-                    'prefix' => $fields['prefix'] ?? null,
-                    'first_name' => $fields['first_name'] ?? null,
-                    'middle_name' => $fields['middle_name'] ?? null,
-                    'last_name' => $fields['last_name'] ?? null,
-                    'suffix' => $fields['suffix'] ?? null,
-                    'position' => $fields['position'] ?? null,
-                    'user_access' => $fields['user_access'] ?? null,
-                ]);
+            $authAttempt = Auth::attempt(['email' => $fields['email'], 'password' => $fields['password']]);
+            if (!$authAttempt) {
+                return $this->dataResponse('error', 200, __('msg.login_failed'));
             }
-            $userId = User::where('employee_id', $fields['employee_id'])->first()->id;
-            Auth::loginUsingId($userId);
+
+            $userModel = UserModel::select([
+                'email',
+                'first_name',
+                'last_name',
+                'middle_name',
+                'prefix',
+                'suffix',
+                'position',
+                'user_access'
+            ])
+                ->selectRaw("
+            TRIM(
+                CONCAT(
+                    IFNULL(CONCAT(prefix, ' '), ''),
+                    IFNULL(CONCAT(first_name, ' '), ''),
+                    IF(middle_name IS NOT NULL AND middle_name != '', CONCAT(middle_name, ' '), ''),
+                    IFNULL(CONCAT(last_name, ' '), ''),
+                    IFNULL(suffix, '')
+                )
+            ) AS full_name
+        ")
+                ->where('credential_id', auth()->id())
+                ->first();
             $token = auth()->user()->createToken('appToken')->plainTextToken;
             DB::commit();
             $data = [
+                'user_details' => $userModel,
                 'token' => $token,
             ];
             return $this->dataResponse('success', 200, __('msg.login_success'), $data);
@@ -65,6 +75,7 @@ class CredentialController extends Controller
             return $this->dataResponse('error', 400, $exception->getMessage());
         }
     }
+
 
     public function onCheckToken()
     {

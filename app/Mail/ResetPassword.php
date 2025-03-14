@@ -18,7 +18,7 @@ class ResetPassword extends Mailable
      */
     public function __construct($full_name, $temporary_url)
     {
-        $this->$full_name = $full_name;
+        $this->full_name = $full_name;
         $this->temporary_url = $temporary_url;
     }
     /**

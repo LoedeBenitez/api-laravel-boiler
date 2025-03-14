@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\v1\Access;
+namespace App\Http\Controllers\Access;
 
 use App\Http\Controllers\Controller;
 use App\Models\Access\ModulePermissionModel;

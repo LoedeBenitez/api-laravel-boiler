@@ -9,8 +9,10 @@ return new class extends Migration {
     {
         Schema::create('credentials', function (Blueprint $table) {
             $table->id();
-            $table->string('employee_id')->unique();
+            $table->string('email')->unique();
             $table->string('password')->nullable();
+            $table->text('signed_route')->nullable();
+            $table->text('otp')->nullable();
             $table->tinyInteger('status')->default(1);
             $table->timestamps();
         });
