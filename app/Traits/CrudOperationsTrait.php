@@ -1,20 +1,20 @@
 <?php
 
-namespace App\Traits\MOS;
+namespace App\Traits;
 
-use App\Http\Controllers\v1\History\ProductionLogController;
 use Exception;
 use App\Traits\ResponseTrait;
 use DB;
 use Illuminate\Database\QueryException;
 
-trait MosCrudOperationsTrait
+trait CrudOperationsTrait
 {
-    use ResponseTrait, ProductionLogTrait;
+    use ResponseTrait;
     public function createRecord($model, $request, $rules, $modelName, $path = null)
     {
         $fields = $request->validate($rules);
         try {
+            DB::beginTransaction();
             $record = new $model();
             $record->fill($fields);
             if ($request->hasFile('attachment')) {
@@ -23,9 +23,10 @@ trait MosCrudOperationsTrait
                 $record->attachment = $filepath;
             }
             $record->save();
-            $this->createProductionLog($model, $record->id, $fields, $fields['created_by_id'], 0);
+            DB::commit();
             return $this->dataResponse('success', 201, $modelName . ' ' . __('msg.create_success'), $record);
         } catch (Exception $exception) {
+            DB::rollBack();
             return $this->dataResponse('error', 400, __('msg.create_failed'));
         }
     }
@@ -33,6 +34,7 @@ trait MosCrudOperationsTrait
     {
         $fields = $request->validate($rules);
         try {
+            DB::beginTransaction();
             $record = new $model();
             $record = $model::find($id);
             if ($record) {
@@ -43,11 +45,13 @@ trait MosCrudOperationsTrait
                     $record->attachment = $filepath;
                     $record->save();
                 }
-                $this->createProductionLog($model, $record->id, $fields, $fields['updated_by_id'], 1);
+                DB::commit();
                 return $this->dataResponse('success', 201, $modelName . ' ' . __('msg.update_success'), $record);
             }
+            DB::rollBack();
             return $this->dataResponse('error', 200, $modelName . ' ' . __('msg.update_failed'));
         } catch (Exception $exception) {
+            DB::rollBack();
             return $this->dataResponse('error', 400, $exception->getMessage());
         }
     }
@@ -231,33 +235,41 @@ trait MosCrudOperationsTrait
             'created_by_id' => 'required',
         ]);
         try {
+            DB::beginTransaction();
             $data = $model::find($id);
             if ($data) {
                 $response = $data->toArray();
                 $response['status'] = !$response['status'];
                 $data->update($response);
-                $this->createProductionLog($model, $model->id, $data, $fields['created_by_id'], 1);
+                DB::commit();
                 return $this->dataResponse('success', 200, __('msg.update_success'), $response);
             }
+            DB::rollBack();
             return $this->dataResponse('error', 200, $modelName . ' ' . __('msg.record_not_found'));
         } catch (Exception $exception) {
+            DB::rollBack();
             return $this->dataResponse('error', 400, $exception->getMessage());
         }
     }
     public function deleteRecordById($model, $id, $modelName)
     {
         try {
+            DB::beginTransaction();
             $deletedRows = $model::destroy($id);
             if ($deletedRows) {
+                DB::commit();
                 return $this->dataResponse('success', 200, __('msg.delete_success'));
             }
+            DB::rollBack();
             return $this->dataResponse('error', 200, $modelName . ' ' . __('msg.delete_failed'));
         } catch (QueryException $exception) {
+            DB::rollBack();
             if ($exception->getCode() == 23000) {
                 return $this->dataResponse('error', 400, __('msg.delete_failed_fk_constraint', ['modelName' => $modelName]));
             }
             return $this->dataResponse('error', 400, __('msg.delete_failed'));
         } catch (Exception $exception) {
+            DB::rollBack();
             return $this->dataResponse('error', 400, $exception->getMessage());
         }
     }

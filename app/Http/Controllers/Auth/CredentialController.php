@@ -113,62 +113,38 @@ class CredentialController extends Controller
     public function onResetPassword(Request $request)
     {
         $fields = $request->validate([
-            'employee_id' => 'required',
+            'email' => 'required|email',
             'password' => 'required|confirmed|min:6',
             'password_confirmation' => 'required|min:6',
         ]);
         try {
-            $credentialToUpdate = Credential::where('employee_id', $fields['employee_id'])->first();
-            $isNotFirstLogin = $credentialToUpdate->is_first_login == 0;
-            $signedRoute = explode($credentialToUpdate->signed_route, '|')[0];
-            if (!$credentialToUpdate || ($isNotFirstLogin && $signedRoute == 'create')) {
-                return $this->dataResponse('error', 400, __('msg.password_change_unsuccessful'));
-            }
-            $credentialToUpdate->password = bcrypt($request->password);
-            $credentialToUpdate->is_first_login = 0;
-            $credentialToUpdate->is_locked = 0;
+            $credentialToUpdate = CredentialModel::where('email', $fields['email'])->firstOrFail();
+            $credentialToUpdate->password = $fields['password_confirmation'];
             $credentialToUpdate->signed_route = null;
             $credentialToUpdate->update();
             return $this->dataResponse('success', 201, __('msg.password_change_successful'));
         } catch (Exception $exception) {
-            return $this->dataResponse('error', 400, $exception->getMessage());
+            return $this->dataResponse('error', 400, 'Email address does not exist');
         }
     }
     public function onForgotPassword(Request $request)
     {
         $fields = $request->validate([
-            'type' => 'required|in:create,reset,lock,otp',
-            'route' => 'required',
-            'email' => 'nullable|email',
-            'phone_number' => 'nullable'
+            // 'type' => 'required|in:create,reset,lock,otp',
+            // 'route' => 'required',
+            'email' => 'required|email',
+            // 'phone_number' => 'nullable'
         ]);
         try {
-            if (isset($fields['email'])) {
-                $personalInformation = PersonalInformation::where('personal_email', $fields['email'])
-                    ->orWhere('company_email', $fields['email'])
-                    ->first();
-                if (!$personalInformation) {
-                    return $this->dataResponse('error', 404, __('msg.email_not_found'));
-                }
-                $credentialQuery = Credential::where('employee_id', $personalInformation->employee_id);
-                if ($fields['type'] == 'create') {
-                    $credentialQuery->where('is_first_login', 1);
-                }
-                $temporaryUrl = $this->onCreateSignedUrl($credentialQuery, $fields['type'], $fields['route']);
-                $full_name = $personalInformation->first_name . ' ' . $personalInformation->last_name;
-                $this->onSendSignedUrl($fields['email'], $fields['type'], $full_name, $temporaryUrl);
-                return $this->dataResponse('success', 200, __('msg.email_sent'));
-            } else {
-                $contactNumber = ContactNumber::where('phone_number', $fields['phone_number'])->first();
-                $credentialQuery = $contactNumber->personalInformation->credential;
-                $this->onCreateSignedUrl($credentialQuery, $fields['type'], $fields['route']);
-                return $this->dataResponse('success', 200, __('msg.signed_url_register'));
-                if (!$contactNumber) {
-                    return $this->dataResponse('error', 404, __('msg.phone_not_found'));
-                }
-            }
+            $credentialModel = CredentialModel::where('email', $fields['email'])->firstOrFail();
+            $userModel = $credentialModel->user;
+            $firstName = $userModel->first_name;
+            $lastName = $userModel->last_name;
+            $temporaryUrl = $this->onCreateSignedUrl($credentialModel, 'create', '/password/create');
+            $firstLastName = $firstName . ' ' . $lastName;
+            $this->onSendSignedUrl($fields['email'], 'create', $firstLastName, $temporaryUrl);
         } catch (Exception $exception) {
-            return $this->dataResponse('error', 400, $exception->getMessage());
+            return $this->dataResponse('error', 400, 'Email does not exist');
         }
     }
 }

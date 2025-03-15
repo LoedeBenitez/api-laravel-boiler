@@ -71,7 +71,7 @@
                     <!-- Header -->
                     <tr>
                         <td class="header">
-                            <img src="{{ $message->embed(public_path('img/logo.png')) }}" alt="Mary Grace Logo" height="100">
+                            <img src="{{ $message->embed(public_path('img/sample-logo.png')) }}" alt="Mary Grace Logo" height="100">
                             <h2>Create Your Password</h2>
                         </td>
                     </tr>

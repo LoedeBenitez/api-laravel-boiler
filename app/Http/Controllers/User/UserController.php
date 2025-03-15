@@ -5,6 +5,7 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use App\Models\CredentialModel;
 use App\Models\UserModel;
+use App\Traits\CrudOperationsTrait;
 use App\Traits\MailTrait;
 use App\Traits\ResponseTrait;
 use Illuminate\Http\Request;
@@ -12,7 +13,7 @@ use Exception;
 use DB;
 class UserController extends Controller
 {
-    use ResponseTrait, MailTrait;
+    use ResponseTrait, MailTrait, CrudOperationsTrait;
     public function onCreate(Request $request)
     {
         $fields = $request->validate([
@@ -70,5 +71,48 @@ class UserController extends Controller
         } catch (Exception $exception) {
             return $this->dataResponse('error', 400, $exception->getMessage());
         }
+    }
+
+    public function onUpdate(Request $request, $id)
+    {
+        $rules = [
+            'email' => 'required|unique:users,email,' . $id,
+            'employee_id' => 'required|unique:users,employee_id,' . $id,
+            'prefix' => 'nullable|string',
+            'suffix' => 'nullable|string',
+            'first_name' => 'required|string',
+            'middle_name' => 'nullable|string',
+            'last_name' => 'required|string',
+            'user_access' => 'nullable',
+            'position' => 'nullable'
+        ];
+        return $this->updateRecordById(UserModel::class, $request, $rules, 'User', $id);
+    }
+
+    public function onDelete($credential_id)
+    {
+        try {
+            DB::beginTransaction();
+            $credentialModel = CredentialModel::findOfFail($credential_id);
+            $userModel = $credentialModel->user;
+
+            $userModel->delete();
+            $credentialModel->delete();
+            DB::commit();
+            return $this->dataResponse('success', 201, __('msg.delete_success'));
+        } catch (Exception $exception) {
+            DB::rollBack();
+            return $this->dataResponse('error', 400, __('msg.delete_failed'));
+        }
+    }
+
+    public function onGetAll()
+    {
+        return $this->readRecord(UserModel::class, 'User');
+    }
+
+    public function onGetById($id)
+    {
+        return $this->readRecordById(UserModel::class, $id, 'User');
     }
 }

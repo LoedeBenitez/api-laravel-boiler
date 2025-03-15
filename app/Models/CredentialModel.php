@@ -27,4 +27,9 @@ class CredentialModel extends Authenticatable
     protected $casts = [
         'password' => 'hashed',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(UserModel::class, 'email', 'email');
+    }
 }
