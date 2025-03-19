@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <title>Create Your Password</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+        *{
+            font-family: "Poppins", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
         body {
             background-color: #f4f4f4;
             margin: 0;
@@ -16,7 +22,8 @@
             background-color: #ffffff;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            padding: 20px;
+            padding-top: 20px;
+            border-top: 20px solid #f36c25; /* Add border top */
         }
         .header {
             text-align: center;
@@ -37,7 +44,7 @@
             padding: 20px;
         }
         .button {
-            background-color: #007BFF;
+            background-color: #f36c25;
             color: #ffffff;
             padding: 12px 24px;
             font-size: 16px;
@@ -57,8 +64,9 @@
         .footer {
             text-align: center;
             font-size: 14px;
-            color: #777;
-            padding-top: 20px;
+            color: #585454;
+            padding: 20px 0 20px 0;
+            background-color: #f36d2556;
         }
     </style>
 </head>
@@ -71,7 +79,7 @@
                     <!-- Header -->
                     <tr>
                         <td class="header">
-                            <img src="{{ $message->embed(public_path('img/sample-logo.png')) }}" alt="Mary Grace Logo" height="100">
+                            <img src="{{asset('img/sample-logo.png')}}" alt="Mary Grace Logo" height="100">
                             <h2>Create Your Password</h2>
                         </td>
                     </tr>
@@ -79,7 +87,7 @@
                     <!-- Content -->
                     <tr>
                         <td class="content">
-                            <p>Hi {{ $full_name }},</p>
+                            <p>Hi Sample User,</p>
                             <p>You are receiving this email because an account has been created for you.
                             Click the button below to set up your password.</p>
                         </td>
@@ -88,7 +96,7 @@
                     <!-- Button -->
                     <tr>
                         <td class="button-container">
-                            <a href="{{ $temporary_url }}" target="_blank" class="button" style="color:white;">Create Password</a>
+                            <a href="#" target="_blank" class="button" style="color:white;">Create Password</a>
                         </td>
                     </tr>
 
@@ -96,7 +104,7 @@
                     <tr>
                         <td class="button-container">
                             <p class="fallback">If the button does not work, click this
-                                <a href="{{ $temporary_url }}" target="_blank" >link</a>.
+                                <a href="#" target="_blank" >link</a>.
                             </p>
                         </td>
                     </tr>
