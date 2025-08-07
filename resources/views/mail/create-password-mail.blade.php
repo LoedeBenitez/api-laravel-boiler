@@ -2,71 +2,117 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Your Password</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-        *{
-            font-family: "Poppins", sans-serif;
-            font-weight: 400;
-            font-style: normal;
-        }
-        body {
-            background-color: #f4f4f4;
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
+            font-family: "Poppins", sans-serif;
         }
+
+        body {
+            background-color: #f9fafb;
+            margin: 0;
+            padding: 20px;
+        }
+
         .email-container {
             max-width: 600px;
-            margin: 20px auto;
+            margin: 0 auto;
             background-color: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            padding-top: 20px;
-            border-top: 20px solid #f36c25; /* Add border top */
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            border-top: 6px solid #f36c25; /* Accent border */
         }
+
         .header {
             text-align: center;
-            padding-bottom: 20px;
+            padding: 30px 20px;
+            background-color: #fdf2ec;
         }
+
         .header h2 {
-            color: #333;
-            margin: 0;
+            color: #f36c25; /* Updated to orange */
+            font-size: 26px; /* Slightly bigger */
+            font-weight: 600;
+            margin-top: 12px;
+            letter-spacing: 0.5px; /* Added spacing */
         }
+
         .content {
             font-size: 16px;
-            color: #555;
-            line-height: 1.6;
-            padding: 0 20px;
+            color: #555555;
+            line-height: 1.8;
+            padding: 25px 30px;
         }
+
+        .content p {
+            margin-bottom: 15px;
+        }
+
         .button-container {
             text-align: center;
             padding: 20px;
         }
+
         .button {
             background-color: #f36c25;
             color: #ffffff;
-            padding: 12px 24px;
+            padding: 14px 28px;
             font-size: 16px;
+            font-weight: 500;
             text-decoration: none;
-            border-radius: 5px;
+            border-radius: 8px;
             display: inline-block;
-            margin-bottom: 10px;
+            transition: background-color 0.3s ease-in-out;
         }
+
+        .button:hover {
+            background-color: #e55a1d;
+        }
+
         .fallback {
             font-size: 14px;
-            color: #777;
+            color: #777777;
+            margin-top: 10px;
         }
+
         .fallback a {
-            color: #007BFF;
+            color: #f36c25;
             text-decoration: none;
+            font-weight: 500;
         }
+
+        .fallback a:hover {
+            text-decoration: underline;
+        }
+
         .footer {
             text-align: center;
             font-size: 14px;
             color: #585454;
-            padding: 20px 0 20px 0;
-            background-color: #f36d2556;
+            padding: 15px 20px;
+            background-color: #f8f9fa;
+        }
+
+        .footer p {
+            margin: 5px 0;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .email-container {
+                width: 100%;
+                border-radius: 0;
+            }
+            .content, .button-container {
+                padding: 20px;
+            }
         }
     </style>
 </head>
@@ -79,7 +125,7 @@
                     <!-- Header -->
                     <tr>
                         <td class="header">
-                            <img src="{{asset('img/sample-logo.png')}}" alt="Mary Grace Logo" height="100">
+                            <img src="{{ $message->embed(public_path('img/sample-logo.png')) }}" alt="Company Logo" height="80">
                             <h2>Create Your Password</h2>
                         </td>
                     </tr>
@@ -87,24 +133,24 @@
                     <!-- Content -->
                     <tr>
                         <td class="content">
-                            <p>Hi Sample User,</p>
-                            <p>You are receiving this email because an account has been created for you.
-                            Click the button below to set up your password.</p>
+                            <p>Hi {{ $full_name }},</p>
+                            <p>We're excited to have you onboard! An account has been created for you.</p>
+                            <p>Click the button below to create your password and access your account.</p>
                         </td>
                     </tr>
 
                     <!-- Button -->
                     <tr>
                         <td class="button-container">
-                            <a href="#" target="_blank" class="button" style="color:white;">Create Password</a>
+                            <a href="{{ $temporary_url }}" target="_blank" class="button" style="color:white">Create Password</a>
                         </td>
                     </tr>
 
                     <!-- Fallback Link -->
                     <tr>
                         <td class="button-container">
-                            <p class="fallback">If the button does not work, click this
-                                <a href="#" target="_blank" >link</a>.
+                            <p class="fallback">If the button doesn't work, please click this
+                                <a href="{{ $temporary_url }}" target="_blank">link</a>.
                             </p>
                         </td>
                     </tr>
@@ -112,7 +158,7 @@
                     <!-- Footer -->
                     <tr>
                         <td class="footer">
-                            <p>If you didn’t request this email, you can safely ignore it.</p>
+                            <p>If you didn't request this email, you can safely ignore it.</p>
                             <p>&copy; {{ date('Y') }} Your Company. All rights reserved.</p>
                         </td>
                     </tr>

@@ -43,9 +43,9 @@ Route::group(['middleware' => ['auth:sanctum', 'check.system.status:SMPL-SYS']],
 
     #region User Methods
     Route::post('user/create', [App\Http\Controllers\User\UserController::class, 'onCreate']);
-    Route::post('user/update/{id}', [App\Http\Controllers\User\UserController::class, 'onUpdate']);
+    Route::post('user/update/{user_id}', [App\Http\Controllers\User\UserController::class, 'onUpdate']);
     Route::post('user/delete/{credential_id}', [App\Http\Controllers\User\UserController::class, 'onDelete']);
-    Route::get('user/get/{id}', [App\Http\Controllers\User\UserController::class, 'onGetById']);
+    Route::get('user/get/{user_id}', [App\Http\Controllers\User\UserController::class, 'onGetById']);
     Route::get('user/all/get', [App\Http\Controllers\User\UserController::class, 'onGetAll']);
 
 

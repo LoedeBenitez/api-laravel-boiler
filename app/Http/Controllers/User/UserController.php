@@ -73,11 +73,11 @@ class UserController extends Controller
         }
     }
 
-    public function onUpdate(Request $request, $id)
+    public function onUpdate(Request $request, $user_id)
     {
         $rules = [
-            'email' => 'required|unique:users,email,' . $id,
-            'employee_id' => 'required|unique:users,employee_id,' . $id,
+            // 'email' => 'required|unique:users,email,' . $user_id,
+            // 'employee_id' => 'required|unique:users,employee_id,' . $user_id,
             'prefix' => 'nullable|string',
             'suffix' => 'nullable|string',
             'first_name' => 'required|string',
@@ -86,7 +86,7 @@ class UserController extends Controller
             'user_access' => 'nullable',
             'position' => 'nullable'
         ];
-        return $this->updateRecordById(UserModel::class, $request, $rules, 'User', $id);
+        return $this->updateRecordById(UserModel::class, $request, $rules, 'User', $user_id);
     }
 
     public function onDelete($credential_id)
@@ -111,8 +111,8 @@ class UserController extends Controller
         return $this->readRecord(UserModel::class, 'User');
     }
 
-    public function onGetById($id)
+    public function onGetById($user_id)
     {
-        return $this->readRecordById(UserModel::class, $id, 'User');
+        return $this->readRecordById(UserModel::class, $user_id, 'User');
     }
 }

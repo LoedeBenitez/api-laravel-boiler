@@ -1,11 +1,11 @@
-<div class="lg:flex xs:block h-screen bg-background overflow-hidden  ">
+<div class="flex-col h-screen bg-background">
     <div wire:loading wire:target="onSave">
         <x-loader />
     </div>
-    <div id="login_form" class="lg:basis-3/5  bg-background my-auto flex flex-col  items-center">
+    <div id="login_form" class="lg:basis-full  bg-background my-auto flex flex-col  items-center">
         <div class="flex flex-col items-center">
-            <img aria-hidden="true" class="w-24" src="{{ asset('img/logo.png') }}" alt="MG Image" />
-            <p class="text-primary text-3xl font-black font-header mt-2 mb-10">Mary Grace Portal</p>
+            <img aria-hidden="true" class="w-24" src="{{ asset('img/logo.png') }}"/>
+            <p class="text-primary text-3xl font-black font-header mt-2 mb-10">Admin Portal</p>
         </div>
         <div class="bg-white rounded-lg shadow-md h-auto md:w-6/12 border p-10">
             <h1 class="font-black text-3xl mb-10">Welcome Back!</h1>
@@ -35,8 +35,8 @@
             <x-toast />
         </div>
     </div>
-    <div class="md:hidden lg:block lg:basis-2/5  bg-primary">
+    {{-- <div class="md:hidden lg:block lg:basis-2/5  bg-primary">
         <div id="image" class="w-full h-screen bg-cover  opacity-50  "
             style="background-image: url('{{ asset('img/login_image.jpg') }}');"></div>
-    </div>
+    </div> --}}
 </div>

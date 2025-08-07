@@ -91,7 +91,6 @@ class CredentialController extends Controller
         }
     }
 
-    // OMG API
     public function onCreateSignedUrl($credentialQuery, $type, $route)
     {
         try {

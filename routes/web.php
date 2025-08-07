@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 
-// Route::get('/login', Login::class)->name('login');
+// Route::get('/', Login::class)->name('login');
 // Route::get('/documentation', Documentation::class)->name('documentation');
 // Route::get('/endpoint', Endpoint::class)->name('endpoint');
 Route::get('/preview-create-password-mail', function () {
